@@ -25,16 +25,16 @@ COPY . .
 # Install all dependencies (including dev) for build
 RUN pnpm install --frozen-lockfile
 
-# Build Next.js app with standalone output for smaller runtime image
+# Build socket server
+WORKDIR /app/packages/socket
+RUN if [ -f "tsconfig.json" ]; then pnpm build; fi
+
+# Build Next.js app with standalone output
 WORKDIR /app/packages/web
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN pnpm build
-
-# Build socket server if needed (TypeScript or similar)
-WORKDIR /app/packages/socket
-RUN if [ -f "tsconfig.json" ]; then pnpm build; fi
 
 # ----- RUNNER -----
 FROM node:22-alpine AS runner
@@ -56,18 +56,21 @@ COPY --from=builder /app/packages/web/.next/standalone ./
 COPY --from=builder /app/packages/web/.next/static ./packages/web/.next/static
 COPY --from=builder /app/packages/web/public ./packages/web/public
 
+# Copy the production server
+COPY --from=builder /app/packages/web/server.production.mjs ./packages/web/server.production.mjs
+
 # Copy the socket server build
 COPY --from=builder /app/packages/socket/dist ./packages/socket/dist
 
 # Copy the game default config
 COPY --from=builder /app/config ./config
 
-# Expose the web and socket ports
-EXPOSE 3000 5505
+# Expose the web port (socket runs on the same port)
+EXPOSE 3000
 
 # Environment variables
 ENV NODE_ENV=production
 ENV CONFIG_PATH=/app/config
 
-# Start both services (Next.js web app + Socket server)
-CMD ["sh", "-c", "node packages/web/server.js & node packages/socket/dist/index.cjs"]
+# Start combined server (Next.js web app + Socket server on same port)
+CMD ["node", "packages/web/server.production.mjs"]

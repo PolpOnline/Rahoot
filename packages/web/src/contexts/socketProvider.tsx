@@ -39,7 +39,7 @@ const SocketContext = createContext<SocketContextValue>({
 })
 
 const getSocketServer = async () =>
-  await ky.get("/env").json<{ webUrl: string; socketUrl: string }>()
+  await ky.get("/env").json<{ webUrl: string }>()
 
 const getClientId = (): string => {
   try {
@@ -73,9 +73,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     const initSocket = async () => {
       try {
-        const { webUrl, socketUrl } = await getSocketServer()
+        const { webUrl } = await getSocketServer()
 
-        s = io(socketUrl, {
+        s = io({
           autoConnect: false,
           auth: {
             clientId,
