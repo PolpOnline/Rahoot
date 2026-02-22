@@ -51,10 +51,8 @@ Or using Docker directly:
 ```bash
 docker run -d \
   -p 3000:3000 \
-  -p 3001:3001 \
   -v ./config:/app/config \
   -e WEB_ORIGIN=http://localhost:3000 \
-  -e SOCKET_URL=http://localhost:3001 \
   ralex91/rahoot:latest
 ```
 
@@ -70,7 +68,6 @@ The folder will be created automatically on first run with an example quiz to ge
 The application will be available at:
 
 - Web Interface: http://localhost:3000
-- WebSocket Server: ws://localhost:3001
 
 ### 🛠️ Without Docker
 
