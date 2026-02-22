@@ -1,8 +1,5 @@
 name: Docker Release
-on:
-  push:
-    branches: ["**"]
-  workflow_dispatch:
+on: [push]
 
 env:
   DOCKER_PLATFORMS: |
