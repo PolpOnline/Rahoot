@@ -35,11 +35,6 @@ jobs:
       - name: Extract image name (lowercase)
         run: echo "IMAGE_NAME=$(tr '[:upper:]' '[:lower:]' <<< '${{ github.repository }}')" >> $GITHUB_ENV
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: ${{ env.DOCKER_PLATFORMS }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
